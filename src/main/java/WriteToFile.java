@@ -12,10 +12,8 @@ import java.util.Iterator;
 
 public class WriteToFile
 {
-    public static void writeCollection(Collection col)
+    public static void writeCollection(String filename, Collection col)
     {
-        String filename = "emailList.txt";
-
         // file operations
         try (BufferedWriter destination = new BufferedWriter(new FileWriter(filename)))
         {

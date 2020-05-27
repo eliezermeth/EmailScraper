@@ -71,16 +71,16 @@ public class Final
 
         synchronized (synsetEmails)
         {
-            printResults(synsetEmails);
+            synchronized (synsetToVisit)
+            {
+                synchronized (synsetVisited)
+                {
+                    saveResults(synsetEmails, synsetVisited, synsetToVisit);
+                }
+            }
         }
 
         System.exit(0); // shouldn't have to do this; fix
-        try {
-            System.out.println(new URL(startingURL).getHost());
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
     }
 
     private String popURL()
@@ -95,25 +95,29 @@ public class Final
         return url;
     }
 
-    private void printResults(Collection col)
+    private void saveResults(Collection colEmails, Collection colLinksVisited, Collection colLinksToVisit)
     {
-        Iterator<String> emails = col.iterator();
-        while (emails.hasNext())
-        {
-            System.out.println("EMAIL: " + emails.next());
-        }
-
         System.out.println("LINKS VISITED: " + synsetVisited.size());
         System.out.println("SAVED LINKS: " + synsetToVisit.size());
-        System.out.println("EMAILS SAVED: " + col.size());
+        System.out.println("EMAILS SAVED: " + colEmails.size());
 
         System.out.println("Time elapsed: " + getTime(endTime - startTime));
 
-        WriteToFile.writeCollection(col);
-        System.out.println("Wrote emails to file.");
+        System.out.print("Writing emails to file. . . ");
+        WriteToFile.writeCollection("emailList.txt", colEmails);
+        System.out.println("Completed");
 
-        ConnectURL.addEmails(col);
-        System.out.println("Added emails to database.");
+        System.out.print("Writing links visited to file. . . ");
+        WriteToFile.writeCollection("visitedList.txt", colLinksVisited);
+        System.out.println("Completed");
+
+        System.out.print("Writing links not visited to file. . . ");
+        WriteToFile.writeCollection("notVisitedList.txt", colLinksToVisit);
+        System.out.println("Completed");
+
+        System.out.print("Writing emails to online database. . . ");
+        ConnectURL.addEmails(colEmails);
+        System.out.println("Completed");
     }
 
     private String getTime(long time)
@@ -193,7 +197,9 @@ public class Final
             // add harvested emails to main program
             if (emails.size() > 0)
             {
-                synsetEmails.addAll(emails);
+                // need loop to change emails to lowercase
+                for (String email : emails)
+                    synsetEmails.add(email.toLowerCase());
             }
 
             int total;

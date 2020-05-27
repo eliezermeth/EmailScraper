@@ -94,7 +94,7 @@ public class SingleFileScraper
 
         System.out.println("Time elapsed: " + getTime(endTime - startTime));
 
-        WriteToFile.writeCollection(col);
+        WriteToFile.writeCollection("emailList.txt", col);
         System.out.println("Wrote emails to file.");
 
         ConnectURL.addEmails(col);
